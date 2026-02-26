@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 32px;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    h2 { margin: 0; }
+    #welcome { color: green; font-weight: bold; }
+    label { display: block; margin-bottom: 6px; font-weight: bold; }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-clear {
+      flex: 1;
+      padding: 13px;
+      background: #e91e8c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn-register {
+      flex: 1;
+      padding: 13px;
+      background: #4B0EE6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    .btn-logout {
+      padding: 10px 18px;
+      background: #e53935;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th {
+      text-align: left;
+      padding: 10px;
+      color: #888;
+      font-size: 13px;
+      border-bottom: 1px solid #eee;
+    }
+    td {
+      padding: 12px 10px;
+      border-bottom: 1px solid #f5f5f5;
+      font-size: 14px;
+    }
+    .btn-delete {
+      padding: 6px 14px;
+      background: #e53935;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="top-row">
+      <div>
+        <h2>Register User</h2>
+        <span id="welcome"></span>
+      </div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+
+    <label>Full Name</label>
+    <input type="text" id="fullName" placeholder="Enter full name" />
+
+    <label>Email</label>
+    <input type="email" id="email" placeholder="Enter email" />
+
+    <label>Phone</label>
+    <input type="text" id="phone" placeholder="Enter phone number" />
+
+    <div class="btn-row">
+      <button class="btn-clear" onclick="clearForm()">Clear</button>
+      <button class="btn-register" onclick="registerUser()">Register</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Registered Users</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="userTableBody"></tbody>
+    </table>
+  </div>
+
+
+  <script>
+
+    function getCookie(name) {
+      let cookies = document.cookie.split(";");
+
+      for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
+        if (cookie.startsWith(name + "=")) {
+          return cookie.substring(name.length + 1);
+        }
+      }
+      return null;
+    }
+    window.onload = function () {
+      let username = getCookie("username");
+      if (!username) {
+        window.location.href = "login.html";
+      } else {
+        document.getElementById("welcome").innerText = "Welcome, " + username;
+        renderTable();
+      }
+    };
+    function registerUser() {
+      let fullName = document.getElementById("fullName").value;
+      let email    = document.getElementById("email").value;
+      let phone    = document.getElementById("phone").value;
+      if (fullName.trim() === "" || email.trim() === "" || phone.trim() === "") {
+        alert("Please fill in all fields!");
+        return; 
+      }
+      let newUser = {
+        fullName: fullName,   
+        email: email,         
+        phone: phone          
+      };
+      let savedData = localStorage.getItem("users");
+      let users = savedData ? JSON.parse(savedData) : [];
+      users.push(newUser);
+      localStorage.setItem("users", JSON.stringify(users));
+      renderTable();
+      clearForm();
+    }
+    function renderTable() {
+      let tbody = document.getElementById("userTableBody");
+      tbody.innerHTML = "";
+      let savedData = localStorage.getItem("users");
+      let users = savedData ? JSON.parse(savedData) : [];
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#aaa;">No users registered yet</td></tr>';
+        return;
+      }
+      for (let i = 0; i < users.length; i++) {
+        let row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${users[i].fullName}</td>
+          <td>${users[i].email}</td>
+          <td>${users[i].phone}</td>
+          <td><button class="btn-delete" onclick="deleteUser(${i})">Delete</button></td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+    function deleteUser(index) {
+      let users = JSON.parse(localStorage.getItem("users"));
+      users.splice(index, 1);
+      localStorage.setItem("users", JSON.stringify(users));
+      renderTable();
+    }
+    function clearForm() {
+      document.getElementById("fullName").value = "";
+      document.getElementById("email").value    = "";
+      document.getElementById("phone").value    = "";
+    }
+    function logout() {
+      document.cookie = "username=; path=/; max-age=0";
+      window.location.href = "login.html";
+    }
+
+  </script>
+</body>
+</html>
