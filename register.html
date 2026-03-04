@@ -104,12 +104,16 @@
 </head>
 <body>
 
+  <!-- CARD 1: The registration form -->
   <div class="card">
     <div class="top-row">
       <div>
         <h2>Register User</h2>
+        <!-- This shows "Welcome, username" after page loads -->
+        <!-- It starts empty, JavaScript will fill it in -->
         <span id="welcome"></span>
       </div>
+      <!-- Logout button: calls logout() function when clicked -->
       <button class="btn-logout" onclick="logout()">Logout</button>
     </div>
 
@@ -123,11 +127,14 @@
     <input type="text" id="phone" placeholder="Enter phone number" />
 
     <div class="btn-row">
+      <!-- Clear button: clears all input fields -->
       <button class="btn-clear" onclick="clearForm()">Clear</button>
+      <!-- Register button: saves user data -->
       <button class="btn-register" onclick="registerUser()">Register</button>
     </div>
   </div>
 
+  <!-- CARD 2: The table that shows all registered users -->
   <div class="card">
     <h2>Registered Users</h2>
     <table>
@@ -143,12 +150,9 @@
     </table>
   </div>
 
-
   <script>
-
     function getCookie(name) {
       let cookies = document.cookie.split(";");
-
       for (let i = 0; i < cookies.length; i++) {
         let cookie = cookies[i].trim();
         if (cookie.startsWith(name + "=")) {
@@ -170,6 +174,8 @@
       let fullName = document.getElementById("fullName").value;
       let email    = document.getElementById("email").value;
       let phone    = document.getElementById("phone").value;
+
+      // STEP 2: Basic check — don't save if fields are empty
       if (fullName.trim() === "" || email.trim() === "" || phone.trim() === "") {
         alert("Please fill in all fields!");
         return; 
@@ -186,6 +192,7 @@
       renderTable();
       clearForm();
     }
+    // ============================================================
     function renderTable() {
       let tbody = document.getElementById("userTableBody");
       tbody.innerHTML = "";
@@ -209,7 +216,9 @@
     function deleteUser(index) {
       let users = JSON.parse(localStorage.getItem("users"));
       users.splice(index, 1);
+
       localStorage.setItem("users", JSON.stringify(users));
+s
       renderTable();
     }
     function clearForm() {
@@ -218,6 +227,7 @@
       document.getElementById("phone").value    = "";
     }
     function logout() {
+
       document.cookie = "username=; path=/; max-age=0";
       window.location.href = "login.html";
     }
